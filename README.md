@@ -1,45 +1,29 @@
-# Z哥少妇战法·补票战法·TePu 战法 Python 实战
+# StockTradebyZ - 股票交易策略实现
 
-> **更新时间：2025-06-23** – 适配 *最新* `fetch_kline.py`版本。
+> 基于Z哥少妇战法、补票战法、TePu战法的Python实现
 
----
-
-## 目录
-
-* [项目简介](#项目简介)
-* [快速上手](#快速上手)
-
-  * [安装依赖](#安装依赖)
-  * [Tushare Token（可选）](#tushare-token可选)
-  * [Mootdx 运行前置步骤](#mootdx-运行前置步骤)
-  * [下载历史行情](#下载历史行情)
-  * [运行选股](#运行选股)
-* [参数说明](#参数说明)
-
-  * [`fetch_kline.py`](#fetch_klinepy)
-
-    * [K 线频率编码](#k-线频率编码)
-  * [`select_stock.py`](#select_stockpy)
-  * [内置策略参数](#内置策略参数)
-
-    * [1. BBIKDJSelector（少妇战法）](#1-bbikdjselector少妇战法)
-    * [2. BBIShortLongSelector（补票战法）](#2-bbishortlongselector补票战法)
-    * [3. BreakoutVolumeKDJSelector（TePu 战法）](#3-breakoutvolumekdjselectortepu-战法)
-* [项目结构](#项目结构)
-* [免责声明](#免责声明)
-
----
+![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Last Updated](https://img.shields.io/badge/last%20updated-2025--06--23-brightgreen)
 
 ## 项目简介
 
-| 名称                    | 功能简介                                                                                                             |
+StockTradebyZ是一个基于Python的股票交易策略实现工具，集成了数据获取、技术指标计算和选股策略执行的完整流程。项目实现了三种经典的选股策略：少妇战法、补票战法和TePu战法，可以帮助投资者进行量化选股。
+
+| 核心组件                  | 功能简介                                                                                                             |
 | --------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | **`fetch_kline.py`**  | *按市值筛选* A 股股票，并抓取其**历史 K 线**保存为 CSV。支持 **AkShare / Tushare / Mootdx** 三大数据源，自动增量更新、多线程下载。*本版本不再保存市值快照*，每次运行实时拉取。 |
 | **`select_stock.py`** | 读取本地 CSV 行情，依据 `configs.json` 中的 **Selector** 定义批量选股，结果输出到 `select_results.log` 与控制台。                            |
+| **`Selector.py`**     | 实现了三种选股策略：**BBIKDJSelector**（少妇战法）、**BBIShortLongSelector**（补票战法）、**BreakoutVolumeKDJSelector**（TePu 战法）。        |
 
-内置策略（见 `Selector.py`）：**BBIKDJSelector**（少妇战法）、**BBIShortLongSelector**（补票战法）、**BreakoutVolumeKDJSelector**（TePu 战法）。
+## 功能特点
 
----
+- **多数据源支持**：可从AkShare、Tushare或Mootdx获取A股历史K线数据
+- **市值筛选**：根据市值范围筛选股票，过滤掉不符合条件的标的
+- **增量更新**：自动识别已下载数据，仅更新最新交易日数据
+- **多线程下载**：支持并发下载，提高数据获取效率
+- **多策略选股**：内置三种经典选股策略，可通过配置文件自定义参数
+- **灵活配置**：通过JSON配置文件调整策略参数，无需修改代码
 
 ## 快速上手
 
@@ -59,9 +43,9 @@ pip install -r requirements.txt
 1. **注册账号**
    点击专属注册链接 [https://tushare.pro/register?reg=820660](https://tushare.pro/register?reg=820660) 完成注册。*通过该链接注册，我将获得 50 积分 – 感谢支持！*
 2. **开通基础权限**
-   登录后进入「**平台介绍 → 社区捐助**」，按提示捐赠 **200 元/年** 可解锁 Tushare 基础接口。
+   登录后进入「**平台介绍 → 社区捐助**」，按提示捐赠 **200 元/年** 可解锁 Tushare 基础接口。
 3. **获取 Token**
-   打开个人主页，点击 **「接口 Token」**，复制生成的 Token。
+   打开个人主页，点击 **「接口 Token」**，复制生成的 Token。
 4. **填入代码**
    在 `fetch_kline.py` 约 **第 302 行**：
 
@@ -94,7 +78,7 @@ python fetch_kline.py \
   --workers 10             # 并发线程数
 ```
 
-*首跑* 下载完整历史；之后脚本会 **增量更新**。
+*首次运行* 将下载完整历史数据；之后脚本会 **增量更新**，只下载新的交易日数据。
 
 ### 运行选股
 
@@ -114,7 +98,41 @@ python select_stock.py \
 600690
 ```
 
----
+## 策略说明
+
+### 1. BBIKDJSelector（少妇战法）
+
+少妇战法是一种结合BBI指标和KDJ指标的选股策略，主要关注BBI指标上升趋势和KDJ指标的超卖区域。
+
+**核心逻辑**：
+- BBI指标连续上升一定天数，表明股票处于上升趋势
+- J值低于阈值，表明股票可能处于超卖区域
+- DIF值大于0，表明MACD指标处于多头区域
+
+**适用场景**：适合在调整后寻找反弹机会，或在上升趋势中寻找调整后的买入时机。
+
+### 2. BBIShortLongSelector（补票战法）
+
+补票战法是一种基于BBI指标和短长期RSV对比的选股策略，主要关注短期超跌后的反弹机会。
+
+**核心逻辑**：
+- BBI指标上升，表明股票处于上升趋势
+- 短期RSV低于长期RSV，表明短期超跌
+- DIF值大于0，表明MACD指标处于多头区域
+
+**适用场景**：适合在上升趋势中寻找短期调整后的买入机会。
+
+### 3. BreakoutVolumeKDJSelector（TePu战法）
+
+TePu战法是一种结合放量突破和KDJ指标的选股策略，主要关注放量突破后的买入机会。
+
+**核心逻辑**：
+- 股价在一定周期内出现放量上涨
+- 随后出现缩量调整
+- J值低于阈值，表明股票可能处于超卖区域
+- DIF值大于0，表明MACD指标处于多头区域
+
+**适用场景**：适合在放量突破后寻找缩量调整的买入机会。
 
 ## 参数说明
 
@@ -195,8 +213,6 @@ python select_stock.py \
 | `max_window`       | `60`     | 最大窗口     |
 | `price_range_pct`  | `100`    | 价格波动 (%) |
 
----
-
 ## 项目结构
 
 ```
@@ -211,9 +227,13 @@ python select_stock.py \
 └── select_results.log       # 选股日志
 ```
 
----
+## 核心代码解析
 
-## 免责声明
+### 数据获取 (fetch_kline.py)
 
-* 本仓库仅供学习与技术研究之用，**不构成任何投资建议**。股市有风险，入市需审慎。
-* 致谢 **@Zettaranc** 在 Bilibili 的无私分享：[https://b23.tv/JxIOaNE](https://b23.tv/JxIOaNE)
+`fetch_kline.py` 是数据获取的核心模块，支持从多个数据源获取股票历史K线数据。主要功能包括：
+
+1. 获取A股股票列表并按市值筛选
+2. 从选定的数据源（tushare、akshare、mootdx）获取历史K线数据
+3. 数据校验和增量更新
+4. 多线程并
