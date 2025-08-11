@@ -120,7 +120,7 @@ def _get_kline_tushare(code: str, start: str, end: str, adjust: str) -> pd.DataF
     adj_flag = None if adjust == "" else adjust
     for attempt in range(1, 4):
         try:
-            time.sleep(1)
+            time.sleep(0.5)
             df = ts.pro_bar(
                 ts_code=ts_code,
                 adj=adj_flag,
