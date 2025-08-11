@@ -120,6 +120,7 @@ def _get_kline_tushare(code: str, start: str, end: str, adjust: str) -> pd.DataF
     adj_flag = None if adjust == "" else adjust
     for attempt in range(1, 4):
         try:
+            time.sleep(1)
             df = ts.pro_bar(
                 ts_code=ts_code,
                 adj=adj_flag,
@@ -287,7 +288,7 @@ def fetch_one(
 
 def main():
     parser = argparse.ArgumentParser(description="按市值筛选 A 股并抓取历史 K 线")
-    parser.add_argument("--datasource", choices=["tushare", "akshare", "mootdx"], default="akshare", help="历史 K 线数据源")
+    parser.add_argument("--datasource", choices=["tushare", "akshare", "mootdx"], default="tushare", help="历史 K 线数据源")
     parser.add_argument("--frequency", type=int, choices=list(_FREQ_MAP.keys()), default=4, help="K线频率编码，参见说明")
     parser.add_argument("--exclude-gem", action="store_true", help="排除创业板/科创板/北交所")
     parser.add_argument("--min-mktcap", type=float, default=5e9, help="最小总市值（含），单位：元")
@@ -300,7 +301,7 @@ def main():
 
     # ---------- Token 处理 ---------- #
     if args.datasource == "tushare":
-        ts_token = "***"
+        ts_token = "af33c3766fdb77c9ae38388a269cf4ab4cd92195853c9e0de19f3b7f"
         ts.set_token(ts_token)
         global pro
         pro = ts.pro_api()
