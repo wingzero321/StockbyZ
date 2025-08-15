@@ -25,6 +25,30 @@ logger = logging.getLogger("select")
 
 # ---------- 工具 ----------
 
+def load_code_name_map(codes: Iterable[str]) -> Dict[str, str]:
+    """从 AkShare 获取代码→名称映射。失败则返回空名称。
+
+    仅返回传入 codes 的子集，避免无用数据。
+    """
+    try:
+        import akshare as ak  # 延迟导入，避免无此依赖时报错退出
+
+        df = ak.stock_zh_a_spot_em()
+        if df is None or df.empty:
+            raise RuntimeError("AkShare 返回空数据")
+        df = df[["代码", "名称"]].dropna()
+        df["代码"] = df["代码"].astype(str).str.zfill(6)
+        mapping_all = dict(zip(df["代码"], df["名称"].astype(str)))
+        mapping = {code: mapping_all.get(code, "") for code in codes}
+        missing = [c for c, n in mapping.items() if not n]
+        if missing:
+            logger.warning("未在快照中找到 %d 只股票名称，例如: %s", len(missing), ", ".join(missing[:5]))
+        return mapping
+    except Exception as e:
+        logger.warning("获取股票名称失败，将仅输出代码：%s", e)
+        return {code: "" for code in codes}
+
+
 def load_data(data_dir: Path, codes: Iterable[str]) -> Dict[str, pd.DataFrame]:
     frames: Dict[str, pd.DataFrame] = {}
     for code in codes:
@@ -117,6 +141,7 @@ def main():
     selector_cfgs = load_config(Path(args.config))
 
     # --- 逐个 Selector 运行 ---
+    name_map = load_code_name_map(codes)
     for cfg in selector_cfgs:
         if cfg.get("activate", True) is False:
             continue
@@ -133,7 +158,29 @@ def main():
         logger.info("============== 选股结果 [%s] ==============", alias)
         logger.info("交易日: %s", trade_date.date())
         logger.info("符合条件股票数: %d", len(picks))
-        logger.info("%s", ", ".join(picks) if picks else "无符合条件股票")
+        if picks:
+            entries: List[str] = []
+            for c in picks:
+                try:
+                    hist = data.get(c, pd.DataFrame())
+                    hist = hist[hist["date"] <= trade_date]
+                    if hist.empty:
+                        entries.append(f"{c} {name_map.get(c, '')}")
+                        continue
+                    last_close = float(hist["close"].iloc[-1])
+                    if len(hist) >= 2 and float(hist["close"].iloc[-2]) > 0:
+                        prev_close = float(hist["close"].iloc[-2])
+                        chg_pct = (last_close / prev_close - 1.0) * 100.0
+                        chg_str = f"{chg_pct:+.2f}%"
+                    else:
+                        chg_str = "-"
+                    entries.append(f"{c} {name_map.get(c, '')} {last_close:.2f} {chg_str}".strip())
+                except Exception as e:
+                    logger.debug("格式化 %s 时出错: %s", c, e)
+                    entries.append(f"{c} {name_map.get(c, '')}")
+            logger.info("%s", "\n".join(entries))
+        else:
+            logger.info("无符合条件股票")
 
 
 if __name__ == "__main__":

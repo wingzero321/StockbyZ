@@ -825,3 +825,20 @@
 2025-08-11 09:06:25,495 [INFO] fetch_kline.py:333 开始抓取 3277 支股票 | 数据源:tushare | 频率:day | 日期:20250101 → 20250811
 2025-08-11 09:17:11,558 [INFO] fetch_kline.py:82 筛选得到 3282 只股票
 2025-08-11 09:17:11,570 [INFO] fetch_kline.py:333 开始抓取 3298 支股票 | 数据源:tushare | 频率:day | 日期:20250101 → 20250811
+2025-08-12 08:32:45,070 [INFO] fetch_kline.py:82 筛选得到 3319 只股票
+2025-08-12 08:32:45,084 [INFO] fetch_kline.py:333 开始抓取 3335 支股票 | 数据源:tushare | 频率:day | 日期:20250101 → 20250812
+2025-08-12 09:03:30,211 [INFO] fetch_kline.py:360 全部任务完成，数据已保存至 C:\Users\Administrator\StockbyZ\data
+2025-08-12 15:55:28,730 [INFO] fetch_kline.py:82 筛选得到 3316 只股票
+2025-08-12 15:55:28,742 [INFO] fetch_kline.py:333 开始抓取 3354 支股票 | 数据源:tushare | 频率:day | 日期:20250101 → 20250812
+2025-08-12 15:56:14,081 [INFO] fetch_kline.py:360 全部任务完成，数据已保存至 C:\Users\Administrator\StockbyZ\data
+2025-08-12 16:01:51,257 [INFO] fetch_kline.py:82 筛选得到 3316 只股票
+2025-08-12 16:01:51,271 [INFO] fetch_kline.py:333 开始抓取 3354 支股票 | 数据源:tushare | 频率:day | 日期:20250101 → 20250812
+2025-08-12 16:02:13,795 [INFO] fetch_kline.py:360 全部任务完成，数据已保存至 C:\Users\Administrator\StockbyZ\data
+2025-08-12 16:05:09,212 [INFO] fetch_kline.py:82 筛选得到 3316 只股票
+2025-08-12 16:05:09,214 [INFO] fetch_kline.py:333 开始抓取 3316 支股票 | 数据源:tushare | 频率:day | 日期:20250101 → 20250812
+2025-08-14 10:17:17,514 [INFO] fetch_kline.py:82 筛选得到 3310 只股票
+2025-08-14 10:17:17,522 [INFO] fetch_kline.py:333 开始抓取 3322 支股票 | 数据源:tushare | 频率:day | 日期:20250101 → 20250814
+2025-08-14 11:36:52,401 [INFO] fetch_kline.py:360 全部任务完成，数据已保存至 C:\Users\Administrator\StockbyZ\data
+2025-08-15 09:48:05,063 [INFO] fetch_kline.py:82 筛选得到 3285 只股票
+2025-08-15 09:48:05,075 [INFO] fetch_kline.py:333 开始抓取 3324 支股票 | 数据源:tushare | 频率:day | 日期:20250101 → 20250815
+2025-08-15 11:30:49,755 [INFO] fetch_kline.py:360 全部任务完成，数据已保存至 C:\Users\Administrator\StockbyZ\data
